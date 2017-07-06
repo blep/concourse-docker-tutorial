@@ -1,0 +1,28 @@
+# Notes about setting up concourse to do the tutorial
+
+https://concourse.ci/docker-repository.html
+https://github.com/concourse/concourse/issues/971
+
+```bash
+mkdir -p keys/web keys/worker
+
+ssh-keygen -t rsa -f ./keys/web/tsa_host_key -N ''
+ssh-keygen -t rsa -f ./keys/web/session_signing_key -N ''
+
+ssh-keygen -t rsa -f ./keys/worker/worker_key -N ''
+
+cp ./keys/worker/worker_key.pub ./keys/web/authorized_worker_keys
+cp ./keys/web/tsa_host_key.pub ./keys/worker
+```
+
+If you're using docker-machine, set CONCOURSE_EXTERNAL_URL to whatever the machine's IP is, for example:
+
+```bash
+export CONCOURSE_EXTERNAL_URL=http://192.168.99.100:8080
+docker-compose up
+```
+Notes: export CONCOURSE_EXTERNAL_URL doesn't work because docker-compose run as root. 
+Solution: hard-coded it in yml. Notes that the host machine IP must be used.
+Failing to do so will cause an error like:
+https://github.com/concourse/concourse/issues/971
+when running 02_task_inputs tutorial.
